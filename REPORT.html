@@ -1,0 +1,1298 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Отчет по лабораторной работе «Разработка микросервиса»</title>
+<style>
+:root {
+  --paper: #faf9f5;
+  --paper-2: #f5f1e8;
+  --ink: #171614;
+  --ink-soft: #4c4740;
+  --muted: #7a7368;
+  --rule: #d8d1c4;
+  --rule-soft: #e8e2d7;
+  --accent: #8a3b12;
+  --code: #f1ede4;
+  --serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); }
+body { font-family: var(--sans); font-size: 16px; line-height: 1.62; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--accent); color: var(--paper); }
+.shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 34px 22px 34px 28px;
+  background: var(--paper-2);
+  border-right: 1px solid var(--rule);
+}
+.eyebrow {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+.sidebar .brand h1 {
+  font-family: var(--serif);
+  font-size: 21px;
+  line-height: 1.15;
+  font-weight: 590;
+  letter-spacing: -0.01em;
+  margin: 8px 0 6px;
+}
+.sidebar .side-meta {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  margin: 0 0 26px;
+  line-height: 1.5;
+}
+.toc-list, .toc-sub { list-style: none; margin: 0; padding: 0; }
+.toc-list > li { margin: 0 0 7px; }
+.toc-list > li > a {
+  display: flex;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ink);
+  text-decoration: none;
+}
+.toc-sub { margin: 4px 0 8px 15px; border-left: 1px solid var(--rule); padding-left: 10px; }
+.toc-sub li { margin: 2px 0; }
+.toc-sub a {
+  display: flex;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+  text-decoration: none;
+  line-height: 1.45;
+}
+.toc-num {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  min-width: 22px;
+  padding-top: 2px;
+}
+.toc-list > li > a .toc-num { color: var(--muted); }
+.side-foot {
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  line-height: 1.7;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+main {
+  max-width: 1040px;
+  padding: 54px clamp(26px, 5vw, 72px) 96px;
+}
+.cover { padding-bottom: 38px; border-bottom: 1px solid var(--rule); }
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--muted);
+}
+.cover h1 {
+  font-family: var(--serif);
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 0.98;
+  font-weight: 590;
+  letter-spacing: -0.03em;
+  margin: 30px 0 14px;
+  max-width: 12ch;
+}
+.cover .subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin: 0 0 18px;
+  max-width: 34ch;
+}
+.cover .lede {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 64ch;
+  margin: 0;
+}
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin: 34px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+.meta div { margin: 0; }
+.meta dt {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  color: var(--muted);
+}
+.meta dd { margin: 3px 0 0; font-size: 14px; line-height: 1.45; }
+h2.no-num::before { display: none; }
+.contents { margin: 42px 0 10px; padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+.contents h2 { border-top: 0; margin-top: 0; padding-top: 0; }
+.contents-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 38px;
+  margin-top: 18px;
+}
+.contents-item {
+  display: flex;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--rule-soft);
+}
+.contents-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  padding-top: 3px;
+  min-width: 22px;
+}
+.contents-title { font-weight: 600; font-size: 14px; line-height: 1.4; }
+.contents-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+h2 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.4vw, 36px);
+  line-height: 1.15;
+  font-weight: 590;
+  letter-spacing: -0.01em;
+  margin: 58px 0 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+h2::before {
+  content: attr(data-num);
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  margin-bottom: 7px;
+}
+h3 {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.45;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  color: var(--ink-soft);
+  margin: 30px 0 10px;
+}
+h3::before {
+  content: attr(data-num) " · ";
+  color: var(--muted);
+  font-family: var(--mono);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+p { margin: 0 0 14px; max-width: 72ch; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; max-width: 72ch; }
+li { margin: 4px 0; }
+strong { font-weight: 600; }
+a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+code {
+  font-family: var(--mono);
+  font-size: 0.87em;
+  background: var(--code);
+  border: 1px solid var(--rule-soft);
+  padding: 1px 5px;
+  color: #5a3e1a;
+}
+pre {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  background: var(--code);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  padding: 14px 18px;
+  margin: 16px 0 20px;
+  overflow-x: auto;
+  max-width: none;
+}
+pre code { background: none; border: 0; padding: 0; color: var(--ink); font-size: inherit; }
+.table-wrap {
+  overflow-x: auto;
+  margin: 16px 0 22px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  max-width: none;
+}
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 13.5px; }
+th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 400;
+}
+td { padding: 9px 12px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+.arch {
+  margin: 26px 0 32px;
+  padding: 18px 0 8px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  max-width: none;
+}
+.arch svg { display: block; width: 100%; height: auto; }
+.arch figcaption { font-size: 12px; color: var(--muted); line-height: 1.55; margin-top: 10px; max-width: 72ch; }
+.signature {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--ink);
+  margin-top: 52px;
+  padding-top: 18px;
+  font-size: 13px;
+}
+.signature .label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.signature .line { display: block; width: 220px; border-bottom: 1px solid var(--ink); height: 20px; }
+.colophon {
+  margin-top: 22px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: none;
+}
+.colophon p { max-width: 72ch; }
+@media (max-width: 980px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  main { padding: 34px 22px 72px; }
+  .meta { grid-template-columns: 1fr 1fr; }
+  .contents-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  .sidebar { display: none; }
+  .shell { display: block; max-width: none; }
+  main { max-width: none; padding: 0; }
+  h2 { page-break-after: avoid; }
+  pre, table, figure { page-break-inside: avoid; }
+  a { color: var(--ink); text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand">
+<span class="eyebrow">Отчёт · лабораторная работа</span>
+<h1>Разработка микросервиса</h1>
+<p class="side-meta">Швецов Г. В.<br>8К31 · вариант 23<br>15.11.2026</p>
+</div>
+<nav>
+<ol class="toc-list"><li><a href="#1"><span class="toc-num">1</span>Введение</a><ol class="toc-sub"><li><a href="#11"><span class="toc-num">1.1</span>Описание сценария</a></li><li><a href="#12"><span class="toc-num">1.2</span>Цели работы</a></li><li><a href="#13"><span class="toc-num">1.3</span>Индивидуализация</a></li></ol></li><li><a href="#2"><span class="toc-num">2</span>Подготовка среды</a><ol class="toc-sub"><li><a href="#21"><span class="toc-num">2.1</span>Требования к стенду</a></li><li><a href="#22"><span class="toc-num">2.2</span>Проверка инструментов</a></li><li><a href="#23"><span class="toc-num">2.3</span>Почему выбран такой стек</a></li></ol></li><li><a href="#3"><span class="toc-num">3</span>Задачи и выполнение</a><ol class="toc-sub"><li><a href="#31"><span class="toc-num">3.1</span>Проектирование модели данных</a></li><li><a href="#32-rest-api"><span class="toc-num">3.2</span>Проектирование REST API</a></li><li><a href="#33"><span class="toc-num">3.3</span>Структура проекта</a></li><li><a href="#34"><span class="toc-num">3.4</span>Сущность и репозиторий</a></li><li><a href="#35"><span class="toc-num">3.5</span>Сервис и контроллер</a></li><li><a href="#36"><span class="toc-num">3.6</span>Валидация запросов</a></li><li><a href="#37"><span class="toc-num">3.7</span>Обработка ошибок</a></li><li><a href="#38-multi-stage-dockerfile"><span class="toc-num">3.8</span>Multi-stage Dockerfile</a></li><li><a href="#39-docker-compose"><span class="toc-num">3.9</span>docker-compose</a></li><li><a href="#310"><span class="toc-num">3.10</span>Сборка и запуск</a></li><li><a href="#311-api"><span class="toc-num">3.11</span>Проверка API</a></li><li><a href="#312-postman"><span class="toc-num">3.12</span>Postman</a></li><li><a href="#313-github"><span class="toc-num">3.13</span>Публикация в GitHub</a></li><li><a href="#314"><span class="toc-num">3.14</span>Соответствие требованиям</a></li></ol></li><li><a href="#4"><span class="toc-num">4</span>Использование ИИ</a></li><li><a href="#5"><span class="toc-num">5</span>Вывод</a></li></ol>
+</nav>
+<div class="side-foot">Java 21 · Spring Boot 3.3.5<br>PostgreSQL 16 · Docker Compose</div>
+</aside>
+<main>
+<header class="cover">
+<div class="cover-top"><span>Лабораторная работа</span><span>8К31 · вариант 23</span></div>
+<h1>Разработка микросервиса</h1>
+<p class="subtitle">REST-сервис на Java 21, PostgreSQL 16 и Docker</p>
+<p class="lede">Практическая реализация микросервиса с шестью CRUD-запросами, multi-stage сборкой, docker-compose и единой обработкой ошибок.</p>
+<dl class="meta">
+<div><dt>Студент</dt><dd>Швецов Георгий Владимирович</dd></div>
+<div><dt>Группа</dt><dd>8К31</dd></div>
+<div><dt>Вариант</dt><dd>23</dd></div>
+<div><dt>Преподаватель</dt><dd>Коровкин</dd></div>
+<div><dt>Дата</dt><dd>15.11.2026</dd></div>
+<div><dt>Репозиторий</dt><dd>github.com/Obure22/task-microservice</dd></div>
+</dl>
+</header>
+<section class="contents">
+<h2 class="no-num">Содержание</h2>
+<div class="contents-grid"><div class="contents-item"><span class="contents-num">01</span><div><div class="contents-title">Введение</div><div class="contents-desc">Сценарий, цели работы и исходные данные.</div></div></div><div class="contents-item"><span class="contents-num">02</span><div><div class="contents-title">Подготовка среды</div><div class="contents-desc">Требования к стенду, проверка инструментов, выбор стека.</div></div></div><div class="contents-item"><span class="contents-num">03</span><div><div class="contents-title">Задачи и выполнение</div><div class="contents-desc">Модель, API, код, Docker, запуск, проверка и публикация.</div></div></div><div class="contents-item"><span class="contents-num">04</span><div><div class="contents-title">Использование ИИ</div><div class="contents-desc">Что сгенерировано с помощью ИИ и что проверено вручную.</div></div></div><div class="contents-item"><span class="contents-num">05</span><div><div class="contents-title">Вывод</div><div class="contents-desc">Итоги работы и полученные навыки.</div></div></div></div>
+</section>
+<h2 id="1" data-num="01">Введение</h2>
+<h3 id="11" data-num="1.1">Описание сценария</h3>
+<p>Команде разработки нужно было сделать небольшой внутренний сервис для учёта задач. Сервис должен принимать запросы по REST API, хранить данные в реляционной базе и разворачиваться вместе с ней одной командой. Отдельное требование — не «падать» на некорректных данных, а возвращать понятную ошибку с правильным HTTP-кодом.</p>
+<p>В качестве полигона использовался локальный Docker Desktop на Windows. Приложение и PostgreSQL запускаются в отдельных контейнерах, связаны через docker-compose и общую сеть. Проверка выполнялась через curl и Postman, проект опубликован в GitHub.</p>
+
+<figure class="arch">
+  <svg viewBox="0 0 960 240" role="img" aria-labelledby="arch-title">
+    <title id="arch-title">Схема работы микросервиса</title>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a3b12"></path>
+      </marker>
+    </defs>
+
+    <rect x="345" y="25" width="620" height="180" fill="none" stroke="#d8d1c4" stroke-dasharray="5 5"></rect>
+    <text x="350" y="17" fill="#7a7368" font-family="Consolas, monospace" font-size="10.5" letter-spacing="1">docker compose · network backend</text>
+
+    <rect x="20" y="70" width="210" height="90" fill="#faf9f5" stroke="#d8d1c4"></rect>
+    <text x="36" y="101" fill="#171614" font-family="Segoe UI, sans-serif" font-size="15" font-weight="600">Postman / curl</text>
+    <text x="36" y="124" fill="#7a7368" font-family="Consolas, monospace" font-size="11">HTTP · JSON</text>
+    <text x="36" y="144" fill="#7a7368" font-family="Segoe UI, sans-serif" font-size="11.5">проверка запросов</text>
+
+    <rect x="370" y="45" width="250" height="140" fill="#f6ede4" stroke="#8a3b12"></rect>
+    <text x="386" y="76" fill="#171614" font-family="Segoe UI, sans-serif" font-size="15" font-weight="600">app · Spring Boot</text>
+    <text x="386" y="98" fill="#4c4740" font-family="Consolas, monospace" font-size="11">порт 8080</text>
+    <text x="386" y="120" fill="#4c4740" font-family="Segoe UI, sans-serif" font-size="11.5">Controller → Service</text>
+    <text x="386" y="140" fill="#4c4740" font-family="Segoe UI, sans-serif" font-size="11.5">→ Repository (JPA)</text>
+    <text x="386" y="162" fill="#7a7368" font-family="Consolas, monospace" font-size="10.5">/actuator/health</text>
+
+    <rect x="760" y="70" width="180" height="90" fill="#faf9f5" stroke="#d8d1c4"></rect>
+    <text x="776" y="101" fill="#171614" font-family="Segoe UI, sans-serif" font-size="15" font-weight="600">db · PostgreSQL 16</text>
+    <text x="776" y="124" fill="#7a7368" font-family="Consolas, monospace" font-size="11">порт 5432</text>
+    <text x="776" y="144" fill="#7a7368" font-family="Segoe UI, sans-serif" font-size="11.5">volume pgdata</text>
+
+    <line x1="232" y1="115" x2="360" y2="115" stroke="#8a3b12" stroke-width="1.2" marker-end="url(#arrow)"></line>
+    <text x="278" y="104" fill="#8a3b12" font-family="Consolas, monospace" font-size="10.5">HTTP</text>
+
+    <line x1="622" y1="115" x2="750" y2="115" stroke="#8a3b12" stroke-width="1.2" marker-end="url(#arrow)"></line>
+    <text x="670" y="104" fill="#8a3b12" font-family="Consolas, monospace" font-size="10.5">JDBC</text>
+  </svg>
+  <figcaption>Схема стенда: Postman или curl обращается к приложению по HTTP, приложение работает с PostgreSQL по JDBC; оба контейнера находятся в сети backend.</figcaption>
+</figure>
+
+<h3 id="12" data-num="1.2">Цели работы</h3>
+<ul>
+<li>Реализовать микросервис минимум с четырьмя REST-запросами.</li>
+<li>Подключить реляционную СУБД.</li>
+<li>Собрать приложение в Docker-образ с multi-stage сборкой.</li>
+<li>Описать совместный запуск приложения и БД через docker-compose.</li>
+<li>Реализовать валидацию входных данных и централизованную обработку ошибок.</li>
+<li>Проверить работу через Postman.</li>
+<li>Разместить проект в GitHub с доступом для clone/fork.</li>
+</ul>
+<h3 id="13" data-num="1.3">Индивидуализация</h3>
+<ul>
+<li><strong>Студент:</strong> Швецов Георгий Владимирович.</li>
+<li><strong>Группа:</strong> 8К31.</li>
+<li><strong>Вариант:</strong> 23.</li>
+<li><strong>Проект:</strong> <code>task-microservice</code>.</li>
+<li><strong>СУБД:</strong> <code>taskdb</code>, пользователь <code>taskuser</code>.</li>
+<li><strong>Контейнеры:</strong> <code>task-service-app</code>, <code>task-service-db</code>.</li>
+</ul>
+<p>Индивидуальный признак <code>8k31-23-shvetsov</code> используется в отчёте и в описании работы; отдельного требования к именам контейнеров в задании не было, поэтому контейнеры названы по функциональному назначению.</p>
+<hr />
+<h2 id="2" data-num="02">Подготовка среды</h2>
+<h3 id="21" data-num="2.1">Требования к стенду</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ресурс</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ОС</td>
+<td>Windows 10 x64</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>29.1.2</td>
+</tr>
+<tr>
+<td>Docker Compose</td>
+<td>v2.40.3 Desktop</td>
+</tr>
+<tr>
+<td>Java в контейнере</td>
+<td>Eclipse Temurin 21</td>
+</tr>
+<tr>
+<td>Сборка</td>
+<td>Maven 3.9 (в контейнере)</td>
+</tr>
+<tr>
+<td>СУБД</td>
+<td>PostgreSQL 16</td>
+</tr>
+<tr>
+<td>Порт API</td>
+<td>8080</td>
+</tr>
+<tr>
+<td>Порт PostgreSQL</td>
+<td>5432 (внутри сети compose)</td>
+</tr>
+<tr>
+<td>Инструмент проверки</td>
+<td>Postman + curl</td>
+</tr>
+</tbody>
+</table></div>
+<p>Локально Maven не устанавливался: сборка выполняется внутри первого этапа Dockerfile. Это удобнее для воспроизводимости — на другой машине не нужно отдельно ставить JDK и Maven, достаточно Docker.</p>
+<h3 id="22" data-num="2.2">Проверка инструментов</h3>
+<pre><code class="language-text">java -version
+java version &quot;26&quot; 2026-03-17
+Java(TM) SE Runtime Environment (build 26+35-2893)
+Java HotSpot(TM) 64-Bit Server VM (build 26+35-2893, sharing)
+
+docker --version
+Docker version 29.1.2, build 890dcca
+
+docker compose version
+Docker Compose version v2.40.3-desktop.1
+
+git --version
+git version 2.45.1.windows.1
+</code></pre>
+<p>Локально стоит Java 26, но проект собирается и запускается на Java 21 в контейнере. Версия Java зафиксирована в <code>pom.xml</code> (<code>&lt;java.version&gt;21&lt;/java.version&gt;</code>) и в базовых образах Dockerfile, поэтому результат не зависит от версии JDK на хосте.</p>
+<h3 id="23" data-num="2.3">Почему выбран такой стек</h3>
+<ul>
+<li><strong>Java + Spring Boot</strong> — быстро даёт готовый REST-контроллер, DI, JPA и валидацию без ручной настройки сервлета.</li>
+<li><strong>Spring Data JPA</strong> — минимум кода для CRUD, репозиторий и транзакции.</li>
+<li><strong>PostgreSQL</strong> — полноценная реляционная СУБД, хорошо работает в контейнере, легко проверяется через <code>psql</code>.</li>
+<li><strong>Docker + docker-compose</strong> — приложение и БД запускаются одной командой, конфигурация описана в репозитории.</li>
+<li><strong>Postman</strong> — наглядная проверка запросов и сохранение коллекции для повторного прогона.</li>
+</ul>
+<hr />
+<h2 id="3" data-num="03">Задачи и выполнение</h2>
+<h3 id="31" data-num="3.1">Проектирование модели данных</h3>
+<p>В качестве предметной области выбраны задачи. Модель получилась небольшой, но достаточной для CRUD и фильтрации.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Тип</th>
+<th>Ограничения</th>
+<th>Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>Long</code></td>
+<td>PK, auto increment</td>
+<td>Идентификатор</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td><code>String</code></td>
+<td>обязательное, 1–120 символов</td>
+<td>Название задачи</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>String</code></td>
+<td>до 1000 символов</td>
+<td>Описание</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>TaskStatus</code></td>
+<td><code>NEW</code>, <code>IN_PROGRESS</code>, <code>DONE</code></td>
+<td>Статус</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td><code>TaskPriority</code></td>
+<td><code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code></td>
+<td>Приоритет</td>
+</tr>
+<tr>
+<td><code>createdAt</code></td>
+<td><code>Instant</code></td>
+<td>заполняется при создании</td>
+<td>Дата создания</td>
+</tr>
+<tr>
+<td><code>updatedAt</code></td>
+<td><code>Instant</code></td>
+<td>обновляется при изменении</td>
+<td>Дата изменения</td>
+</tr>
+</tbody>
+</table></div>
+<p>Статус и приоритет хранятся строками (<code>@Enumerated(EnumType.STRING)</code>), чтобы в БД было читаемое значение, а не порядковый номер.</p>
+<h3 id="32-rest-api" data-num="3.2">Проектирование REST API</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>N</th>
+<th>Метод</th>
+<th>Endpoint</th>
+<th>Назначение</th>
+<th>Код успеха</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>GET</td>
+<td><code>/api/tasks</code></td>
+<td>Список задач, фильтр <code>?status=NEW</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td>2</td>
+<td>GET</td>
+<td><code>/api/tasks/{id}</code></td>
+<td>Задача по идентификатору</td>
+<td>200</td>
+</tr>
+<tr>
+<td>3</td>
+<td>POST</td>
+<td><code>/api/tasks</code></td>
+<td>Создание задачи</td>
+<td>201 + <code>Location</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>PUT</td>
+<td><code>/api/tasks/{id}</code></td>
+<td>Полное обновление</td>
+<td>200</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PATCH</td>
+<td><code>/api/tasks/{id}</code></td>
+<td>Частичное обновление</td>
+<td>200</td>
+</tr>
+<tr>
+<td>6</td>
+<td>DELETE</td>
+<td><code>/api/tasks/{id}</code></td>
+<td>Удаление</td>
+<td>204</td>
+</tr>
+</tbody>
+</table></div>
+<p>Получилось шесть запросов — больше минимальных четырёх. <code>PUT</code> заменяет все поля, <code>PATCH</code> меняет только переданные. <code>POST</code> возвращает заголовок <code>Location</code> со ссылкой на созданный ресурс.</p>
+<h3 id="33" data-num="3.3">Структура проекта</h3>
+<pre><code class="language-text">task-microservice/
+├── Dockerfile
+├── docker-compose.yml
+├── pom.xml
+├── README.md
+├── REPORT.md
+├── postman/
+│   └── Task-Microservice.postman_collection.json
+└── src/main/
+    ├── java/ru/tpu/microservice/
+    │   ├── TaskMicroserviceApplication.java
+    │   ├── domain/
+    │   │   ├── Task.java
+    │   │   ├── TaskStatus.java
+    │   │   └── TaskPriority.java
+    │   ├── dto/
+    │   │   ├── CreateTaskRequest.java
+    │   │   ├── UpdateTaskRequest.java
+    │   │   ├── PatchTaskRequest.java
+    │   │   └── TaskResponse.java
+    │   ├── exception/
+    │   │   └── TaskNotFoundException.java
+    │   ├── repository/
+    │   │   └── TaskRepository.java
+    │   ├── service/
+    │   │   └── TaskService.java
+    │   └── web/
+    │       ├── TaskController.java
+    │       ├── ErrorResponse.java
+    │       └── GlobalExceptionHandler.java
+    └── resources/application.yml
+</code></pre>
+<p>Разделение по слоям: <code>domain</code> — сущность, <code>dto</code> — запросы и ответы API, <code>repository</code> — доступ к БД, <code>service</code> — бизнес-логика, <code>web</code> — контроллер и обработка ошибок.</p>
+<h3 id="34" data-num="3.4">Сущность и репозиторий</h3>
+<pre><code class="language-java">@Entity
+@Table(name = &quot;tasks&quot;)
+public class Task {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 120)
+    private String title;
+
+    @Column(length = 1000)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TaskStatus status = TaskStatus.NEW;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TaskPriority priority = TaskPriority.MEDIUM;
+
+    @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = &quot;updated_at&quot;, nullable = false)
+    private Instant updatedAt;
+
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = Instant.now();
+    }
+
+    // getters и setters
+}
+</code></pre>
+<p>Репозиторий — обычный Spring Data JPA:</p>
+<pre><code class="language-java">public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
+
+    List&lt;Task&gt; findAllByStatus(TaskStatus status, Sort sort);
+}
+</code></pre>
+<p>Схема таблицы создаётся Hibernate автоматически (<code>spring.jpa.hibernate.ddl-auto=update</code>). Для учебного проекта этого достаточно; в production обычно используют Flyway или Liquibase.</p>
+<h3 id="35" data-num="3.5">Сервис и контроллер</h3>
+<p>Контроллер принимает HTTP-запросы, валидирует DTO и делегирует работу сервису:</p>
+<pre><code class="language-java">@RestController
+@RequestMapping(&quot;/api/tasks&quot;)
+public class TaskController {
+
+    private final TaskService taskService;
+
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @GetMapping
+    public List&lt;TaskResponse&gt; findAll(@RequestParam(required = false) TaskStatus status) {
+        return taskService.findAll(status);
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public TaskResponse findById(@PathVariable Long id) {
+        return taskService.findById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;TaskResponse&gt; create(@Valid @RequestBody CreateTaskRequest request) {
+        TaskResponse created = taskService.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path(&quot;/{id}&quot;)
+                .buildAndExpand(created.id())
+                .toUri();
+        return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created);
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public TaskResponse update(@PathVariable Long id,
+                               @Valid @RequestBody UpdateTaskRequest request) {
+        return taskService.update(id, request);
+    }
+
+    @PatchMapping(&quot;/{id}&quot;)
+    public TaskResponse patch(@PathVariable Long id,
+                              @Valid @RequestBody PatchTaskRequest request) {
+        return taskService.patch(id, request);
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id) {
+        taskService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+</code></pre>
+<p>В сервисе <code>create</code>, <code>update</code> и <code>patch</code> помечены <code>@Transactional</code>. Для <code>PUT</code> и <code>PATCH</code> используется <code>saveAndFlush</code>, чтобы <code>@PreUpdate</code> успел обновить <code>updatedAt</code> до формирования ответа.</p>
+<h3 id="36" data-num="3.6">Валидация запросов</h3>
+<p>Входные DTO проверяются аннотациями Jakarta Validation:</p>
+<pre><code class="language-java">public record CreateTaskRequest(
+
+        @NotBlank(message = &quot;Поле 'title' обязательно и не может быть пустым&quot;)
+        @Size(max = 120, message = &quot;Поле 'title' не должно превышать 120 символов&quot;)
+        String title,
+
+        @Size(max = 1000, message = &quot;Поле 'description' не должно превышать 1000 символов&quot;)
+        String description,
+
+        TaskStatus status,
+
+        TaskPriority priority
+) {
+}
+</code></pre>
+<p>Если <code>title</code> пустой или слишком длинный, клиент получает 400 и карту <code>fieldErrors</code>. Неизвестное значение <code>status</code> или <code>priority</code> в JSON приводит к <code>HttpMessageNotReadableException</code> — оно тоже обрабатывается и возвращает 400 с подсказкой допустимых значений.</p>
+<h3 id="37" data-num="3.7">Обработка ошибок</h3>
+<p>Все исключения собраны в одном <code>@RestControllerAdvice</code>. Ответ имеет единый формат:</p>
+<pre><code class="language-json">{
+  &quot;timestamp&quot;: &quot;2026-11-15T08:36:37.831045819Z&quot;,
+  &quot;status&quot;: 400,
+  &quot;error&quot;: &quot;Bad Request&quot;,
+  &quot;message&quot;: &quot;Ошибка валидации входных данных&quot;,
+  &quot;path&quot;: &quot;/api/tasks&quot;,
+  &quot;fieldErrors&quot;: {
+    &quot;title&quot;: &quot;Поле 'title' обязательно и не может быть пустым&quot;
+  }
+}
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ситуация</th>
+<th>Исключение</th>
+<th>HTTP-код</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ошибка валидации DTO</td>
+<td><code>MethodArgumentNotValidException</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td>Нарушение ограничений параметров</td>
+<td><code>ConstraintViolationException</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td>Невалидный JSON / неизвестный enum</td>
+<td><code>HttpMessageNotReadableException</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td>Неверный тип <code>id</code> в пути</td>
+<td><code>MethodArgumentTypeMismatchException</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td>Отсутствует обязательный параметр</td>
+<td><code>MissingServletRequestParameterException</code></td>
+<td>400</td>
+</tr>
+<tr>
+<td>Задача не найдена</td>
+<td><code>TaskNotFoundException</code></td>
+<td>404</td>
+</tr>
+<tr>
+<td>Конфликт с БД</td>
+<td><code>DataIntegrityViolationException</code></td>
+<td>409</td>
+</tr>
+<tr>
+<td>Метод не поддерживается</td>
+<td><code>HttpRequestMethodNotSupportedException</code></td>
+<td>405</td>
+</tr>
+<tr>
+<td>Неверный <code>Content-Type</code></td>
+<td><code>HttpMediaTypeNotSupportedException</code></td>
+<td>415</td>
+</tr>
+<tr>
+<td>Непредвиденная ошибка</td>
+<td><code>Exception</code></td>
+<td>500</td>
+</tr>
+</tbody>
+</table></div>
+<p>Фрагмент обработчика:</p>
+<pre><code class="language-java">@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleValidation(MethodArgumentNotValidException ex,
+                                                          HttpServletRequest request) {
+        Map&lt;String, String&gt; fieldErrors = new LinkedHashMap&lt;&gt;();
+        ex.getBindingResult().getFieldErrors().forEach(error -&gt;
+                fieldErrors.putIfAbsent(error.getField(), error.getDefaultMessage()));
+
+        ErrorResponse body = ErrorResponse.withFields(
+                HttpStatus.BAD_REQUEST,
+                &quot;Ошибка валидации входных данных&quot;,
+                request.getRequestURI(),
+                fieldErrors
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleNotFound(TaskNotFoundException ex,
+                                                        HttpServletRequest request) {
+        ErrorResponse body = ErrorResponse.of(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+}
+</code></pre>
+<p>Главное: при некорректном запросе приложение не завершается. Оно возвращает JSON с кодом, сообщением и путём, а в лог пишет только непредвиденные ошибки.</p>
+<h3 id="38-multi-stage-dockerfile" data-num="3.8">Multi-stage Dockerfile</h3>
+<pre><code class="language-dockerfile"># syntax=docker/dockerfile:1
+
+# ---------- Этап 1: сборка ----------
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /workspace
+
+# Сначала копируем только pom.xml — слой с зависимостями кешируется
+COPY pom.xml .
+RUN mvn -B -q -DskipTests dependency:resolve
+
+# Затем исходники и сборка исполняемого jar
+COPY src ./src
+RUN mvn -B -q -DskipTests clean package
+
+# ---------- Этап 2: запуск ----------
+FROM eclipse-temurin:21-jre-alpine AS runtime
+
+RUN addgroup -S app &amp;&amp; adduser -S app -G app
+
+WORKDIR /app
+COPY --from=build /workspace/target/*.jar app.jar
+
+USER app
+EXPOSE 8080
+
+ENTRYPOINT [&quot;java&quot;, &quot;-jar&quot;, &quot;/app/app.jar&quot;]
+</code></pre>
+<p>Первый этап — полноценный Maven-образ с JDK. Второй — только JRE на Alpine. В финальный образ не попадают Maven, исходники и кэш зависимостей, поэтому он весит около 382 MB, а не несколько сотен мегабайт с инструментами сборки. Приложение запускается от пользователя <code>app</code>, а не от root.</p>
+<h3 id="39-docker-compose" data-num="3.9">docker-compose</h3>
+<pre><code class="language-yaml">name: task-microservice
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: task-service-db
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U taskuser -d taskdb&quot;]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - backend
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task-service-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskdb
+      SPRING_DATASOURCE_USERNAME: taskuser
+      SPRING_DATASOURCE_PASSWORD: taskpass
+    ports:
+      - &quot;8080:8080&quot;
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [&quot;CMD&quot;, &quot;wget&quot;, &quot;-qO-&quot;, &quot;http://localhost:8080/actuator/health&quot;]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+    driver: bridge
+</code></pre>
+<p>Что здесь важно:</p>
+<ul>
+<li><code>db</code> и <code>app</code> находятся в одной сети <code>backend</code>, поэтому приложение обращается к БД по имени <code>db</code>, а не по IP.</li>
+<li><code>depends_on</code> с <code>condition: service_healthy</code> — приложение не стартует, пока PostgreSQL не пройдёт <code>pg_isready</code>.</li>
+<li><code>pgdata</code> — named volume, данные не пропадают при перезапуске контейнеров.</li>
+<li>У приложения тоже есть healthcheck через Actuator, поэтому <code>docker compose ps</code> показывает <code>healthy</code>.</li>
+<li>Пароль <code>taskpass</code> — учебный, для реального проекта его выносят в <code>.env</code> или секреты.</li>
+</ul>
+<h3 id="310" data-num="3.10">Сборка и запуск</h3>
+<pre><code class="language-bash">docker compose up -d --build
+</code></pre>
+<p>Фрагмент вывода:</p>
+<pre><code class="language-text">Container task-service-db  Creating
+Container task-service-db  Created
+Container task-service-db  Starting
+Container task-service-db  Started
+Container task-service-db  Waiting
+Container task-service-db  Healthy
+Container task-service-app  Starting
+Container task-service-app  Started
+</code></pre>
+<p>Проверка состояния:</p>
+<pre><code class="language-bash">docker compose ps
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Сервис</th>
+<th>Контейнер</th>
+<th>Образ</th>
+<th>Статус</th>
+<th>Порты</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app</code></td>
+<td><code>task-service-app</code></td>
+<td><code>task-microservice-app</code></td>
+<td><code>Up (healthy)</code></td>
+<td><code>0.0.0.0:8080 → 8080</code></td>
+</tr>
+<tr>
+<td><code>db</code></td>
+<td><code>task-service-db</code></td>
+<td><code>postgres:16-alpine</code></td>
+<td><code>Up (healthy)</code></td>
+<td><code>5432/tcp</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Healthcheck приложения:</p>
+<pre><code class="language-bash">curl -s http://localhost:8080/actuator/health
+</code></pre>
+<pre><code class="language-json">{&quot;status&quot;:&quot;UP&quot;,&quot;groups&quot;:[&quot;liveness&quot;,&quot;readiness&quot;]}
+</code></pre>
+<h3 id="311-api" data-num="3.11">Проверка API</h3>
+<p>Создание задачи:</p>
+<pre><code class="language-bash">curl -i -X POST http://localhost:8080/api/tasks \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{
+        &quot;title&quot;: &quot;Подготовить отчёт&quot;,
+        &quot;description&quot;: &quot;Собрать результаты за квартал&quot;,
+        &quot;status&quot;: &quot;NEW&quot;,
+        &quot;priority&quot;: &quot;HIGH&quot;
+      }'
+</code></pre>
+<p>Ответ <code>201 Created</code>:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: 2,
+  &quot;title&quot;: &quot;Подготовить отчёт&quot;,
+  &quot;description&quot;: &quot;Собрать результаты за квартал&quot;,
+  &quot;status&quot;: &quot;NEW&quot;,
+  &quot;priority&quot;: &quot;HIGH&quot;,
+  &quot;createdAt&quot;: &quot;2026-11-15T08:36:36.993120597Z&quot;,
+  &quot;updatedAt&quot;: &quot;2026-11-15T08:36:36.993120597Z&quot;
+}
+</code></pre>
+<p>Получение списка:</p>
+<pre><code class="language-bash">curl -s http://localhost:8080/api/tasks
+</code></pre>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: 2,
+    &quot;title&quot;: &quot;Подготовить отчёт&quot;,
+    &quot;description&quot;: &quot;Собрать результаты за квартал&quot;,
+    &quot;status&quot;: &quot;NEW&quot;,
+    &quot;priority&quot;: &quot;HIGH&quot;,
+    &quot;createdAt&quot;: &quot;2026-11-15T08:36:36.993121Z&quot;,
+    &quot;updatedAt&quot;: &quot;2026-11-15T08:36:36.993121Z&quot;
+  }
+]
+</code></pre>
+<p>Обновление через <code>PUT</code>:</p>
+<pre><code class="language-bash">curl -s -X PUT http://localhost:8080/api/tasks/2 \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{
+        &quot;title&quot;: &quot;Подготовить квартальный отчёт&quot;,
+        &quot;description&quot;: &quot;Обновлённое описание&quot;,
+        &quot;status&quot;: &quot;IN_PROGRESS&quot;,
+        &quot;priority&quot;: &quot;MEDIUM&quot;
+      }'
+</code></pre>
+<p>Ответ <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: 2,
+  &quot;title&quot;: &quot;Подготовить квартальный отчёт&quot;,
+  &quot;description&quot;: &quot;Обновлённое описание&quot;,
+  &quot;status&quot;: &quot;IN_PROGRESS&quot;,
+  &quot;priority&quot;: &quot;MEDIUM&quot;,
+  &quot;createdAt&quot;: &quot;2026-11-15T08:36:36.993121Z&quot;,
+  &quot;updatedAt&quot;: &quot;2026-11-15T08:36:37.586183775Z&quot;
+}
+</code></pre>
+<p>Частичное обновление через <code>PATCH</code>:</p>
+<pre><code class="language-bash">curl -s -X PATCH http://localhost:8080/api/tasks/2 \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;status&quot;: &quot;DONE&quot;}'
+</code></pre>
+<p>Ответ <code>200 OK</code>:</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: 2,
+  &quot;title&quot;: &quot;Подготовить квартальный отчёт&quot;,
+  &quot;description&quot;: &quot;Обновлённое описание&quot;,
+  &quot;status&quot;: &quot;DONE&quot;,
+  &quot;priority&quot;: &quot;MEDIUM&quot;,
+  &quot;createdAt&quot;: &quot;2026-11-15T08:36:36.993121Z&quot;,
+  &quot;updatedAt&quot;: &quot;2026-11-15T08:36:37.670078047Z&quot;
+}
+</code></pre>
+<p>Удаление:</p>
+<pre><code class="language-bash">curl -i -X DELETE http://localhost:8080/api/tasks/2
+</code></pre>
+<p>Ответ <code>204 No Content</code>, тело отсутствует. Повторный <code>GET /api/tasks/2</code> возвращает <code>404</code>.</p>
+<p>Сводка проверок:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Сценарий</th>
+<th>Код</th>
+<th>Результат</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST корректной задачи</td>
+<td>201</td>
+<td>задача создана, есть <code>id</code> и <code>Location</code></td>
+</tr>
+<tr>
+<td>GET списка</td>
+<td>200</td>
+<td>массив задач</td>
+</tr>
+<tr>
+<td>GET по id</td>
+<td>200</td>
+<td>задача найдена</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>200</td>
+<td>все поля заменены</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>200</td>
+<td>изменён только статус</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>204</td>
+<td>задача удалена</td>
+</tr>
+<tr>
+<td>POST с пустым <code>title</code></td>
+<td>400</td>
+<td><code>fieldErrors.title</code></td>
+</tr>
+<tr>
+<td>POST с <code>status: UNKNOWN</code></td>
+<td>400</td>
+<td>сообщение о допустимых значениях</td>
+</tr>
+<tr>
+<td>GET <code>?status=UNKNOWN</code></td>
+<td>400</td>
+<td>ошибка параметра</td>
+</tr>
+<tr>
+<td>GET <code>/api/tasks/abc</code></td>
+<td>400</td>
+<td>ошибка типа <code>id</code></td>
+</tr>
+<tr>
+<td>GET <code>/api/tasks/999999</code></td>
+<td>404</td>
+<td>задача не найдена</td>
+</tr>
+<tr>
+<td>GET удалённой задачи</td>
+<td>404</td>
+<td>задача не найдена</td>
+</tr>
+</tbody>
+</table></div>
+<p>Пример ошибки валидации:</p>
+<pre><code class="language-json">{
+  &quot;timestamp&quot;: &quot;2026-11-15T08:36:37.831045819Z&quot;,
+  &quot;status&quot;: 400,
+  &quot;error&quot;: &quot;Bad Request&quot;,
+  &quot;message&quot;: &quot;Ошибка валидации входных данных&quot;,
+  &quot;path&quot;: &quot;/api/tasks&quot;,
+  &quot;fieldErrors&quot;: {
+    &quot;title&quot;: &quot;Поле 'title' обязательно и не может быть пустым&quot;
+  }
+}
+</code></pre>
+<p>Пример ошибки 404:</p>
+<pre><code class="language-json">{
+  &quot;timestamp&quot;: &quot;2026-11-15T08:36:37.938996663Z&quot;,
+  &quot;status&quot;: 404,
+  &quot;error&quot;: &quot;Not Found&quot;,
+  &quot;message&quot;: &quot;Задача с id=999999 не найдена&quot;,
+  &quot;path&quot;: &quot;/api/tasks/999999&quot;
+}
+</code></pre>
+<h3 id="312-postman" data-num="3.12">Postman</h3>
+<p>Коллекция лежит в <code>postman/Task-Microservice.postman_collection.json</code>. В ней 10 запросов:</p>
+<ol>
+<li>Создание задачи.</li>
+<li>Получение всех задач.</li>
+<li>Фильтр по статусу <code>NEW</code>.</li>
+<li>Получение задачи по <code>id</code>.</li>
+<li>Полное обновление <code>PUT</code>.</li>
+<li>Частичное обновление <code>PATCH</code>.</li>
+<li>Удаление.</li>
+<li>Ошибка 400 — пустой <code>title</code>.</li>
+<li>Ошибка 400 — неизвестный статус.</li>
+<li>Ошибка 404 — несуществующая задача.</li>
+</ol>
+<p>Коллекция использует переменные <code>baseUrl</code> (<code>http://localhost:8080</code>) и <code>taskId</code>. После создания задачи тест-скрипт сохраняет <code>id</code> в <code>taskId</code>, поэтому последующие запросы работают с только что созданной задачей. Для запросов есть проверки статусов и полей ответа.</p>
+<p>Порядок проверки: импортировать коллекцию, выполнить запросы по порядку, убедиться, что все тесты зелёные.</p>
+<h3 id="313-github" data-num="3.13">Публикация в GitHub</h3>
+<p>Проект опубликован в публичном репозитории:</p>
+<pre><code class="language-text">https://github.com/Obure22/task-microservice
+</code></pre>
+<p>Ветка <code>master</code>, основные коммиты:</p>
+<pre><code class="language-text">bd5e620 Уточнена ссылка для клонирования репозитория
+4240128 Добавлен отчёт по лабораторной работе
+dd2d2e0 Лабораторная работа: REST-микросервис задач на Java, PostgreSQL и Docker
+</code></pre>
+<p>Проверка клонирования:</p>
+<pre><code class="language-bash">git clone https://github.com/Obure22/task-microservice.git
+cd task-microservice
+</code></pre>
+<p>Клонирование выполняется успешно, репозиторий публичный, доступны clone и fork.</p>
+<h3 id="314" data-num="3.14">Соответствие требованиям</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>N</th>
+<th>Требование</th>
+<th>Реализация</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Минимум 4 запроса</td>
+<td>6 запросов: GET, GET by id, POST, PUT, PATCH, DELETE</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Любой язык</td>
+<td>Java 21, Spring Boot 3.3.5</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Реляционная СУБД</td>
+<td>PostgreSQL 16, Spring Data JPA</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Совместное развёртывание в Docker</td>
+<td>Два контейнера: <code>app</code> и <code>db</code>, общая сеть</td>
+</tr>
+<tr>
+<td>5</td>
+<td>docker-compose + multi-stage</td>
+<td><code>docker-compose.yml</code>, двухэтапный <code>Dockerfile</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>GitHub/GitLab с clone/fork</td>
+<td>Публичный репозиторий GitHub</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Проверка через Postman</td>
+<td>Коллекция из 10 запросов с тестами</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Обработка ошибок</td>
+<td><code>GlobalExceptionHandler</code>, коды 400/404/405/409/415/500</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4" data-num="04">Использование ИИ</h2>
+<p>При выполнении работы ИИ использовался как вспомогательный инструмент:</p>
+<ul>
+<li>генерация каркаса Spring Boot-приложения и структуры пакетов;</li>
+<li>подготовка DTO, аннотаций валидации и обработчика исключений;</li>
+<li>проверка Dockerfile и docker-compose;</li>
+<li>подготовка Postman-коллекции;</li>
+<li>оформление README и этого отчёта.</li>
+</ul>
+<p>Что проверялось вручную:</p>
+<ul>
+<li>сборка образа и запуск контейнеров;</li>
+<li>статусы контейнеров и healthcheck;</li>
+<li>все HTTP-запросы и коды ответов;</li>
+<li>содержимое JSON-ответов и сообщений об ошибках;</li>
+<li>push в GitHub и контрольное клонирование.</li>
+</ul>
+<p>В процессе пришлось исправить пару технических мелочей: на Windows файлы сначала создались с нижним регистром (<code>task.java</code>, <code>dockerfile</code>), что сломало бы сборку на Linux; имена привели к нужному регистру. Ещё <code>updatedAt</code> в ответе <code>PUT</code> сначала оставался старым, пока не заменили <code>save</code> на <code>saveAndFlush</code>, чтобы <code>@PreUpdate</code> срабатывал до формирования ответа. Эти ошибки не попали в финальную версию.</p>
+<hr />
+<h2 id="5" data-num="05">Вывод</h2>
+<p>В ходе работы я реализовал REST-микросервис на Java 21 со Spring Boot и PostgreSQL. Сервис поддерживает шесть запросов: создание, получение списка и одной задачи, полное и частичное обновление, удаление. Данные хранятся в PostgreSQL, схема создаётся Hibernate, доступ к БД идёт через Spring Data JPA.</p>
+<p>Приложение и база разворачиваются совместно через docker-compose. Сборка выполнена в multi-stage Dockerfile: Maven-этап собирает jar, runtime-этап запускает его на JRE от непривилегированного пользователя. Healthcheck PostgreSQL не даёт приложению стартовать раньше БД, а healthcheck Actuator показывает состояние самого сервиса.</p>
+<p>Отдельно проверена обработка ошибок: пустой <code>title</code>, неизвестный статус, неверный тип <code>id</code>, несуществующая задача и удалённая задача возвращают 400 или 404 с понятным JSON-сообщением, приложение при этом продолжает работать. Все сценарии прогнаны через curl и Postman, коллекция сохранена в репозитории.</p>
+<p>Проект опубликован в GitHub, клонирование и fork доступны. Работа показала, что для небольшого сервиса достаточно Spring Boot + JPA + PostgreSQL, а Docker-compose сильно упрощает воспроизводимый запуск. Основная сложность была не в коде, а в аккуратности: регистр имён файлов, порядок этапов сборки, healthcheck и единый формат ошибок. В целом мероприятие полезное, отношусь положительно.</p>
+<footer class="colophon">
+<div class="signature">
+<div><span class="label">Дата сдачи</span><span>15.11.2026</span></div>
+<div><span class="label">Подпись студента</span><span class="line"></span></div>
+</div>
+<p>Отчёт подготовлен по материалам проекта task-microservice. Репозиторий: <a href="https://github.com/Obure22/task-microservice">github.com/Obure22/task-microservice</a>.</p>
+</footer>
+</main>
+</div>
+</body>
+</html>

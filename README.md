@@ -41,6 +41,9 @@ Postman / curl
 ├── Dockerfile                 # multi-stage: maven-сборка → JRE-запуск
 ├── docker-compose.yml         # app + PostgreSQL, healthcheck, volume
 ├── pom.xml
+├── README.md
+├── REPORT.md                  # полный отчёт по лабораторной работе
+├── REPORT.html                # версия отчёта для просмотра и печати
 ├── postman/
 │   └── Task-Microservice.postman_collection.json
 └── src/main/
@@ -54,6 +57,12 @@ Postman / curl
     │   └── web/               # контроллер и обработчик ошибок
     └── resources/application.yml
 ```
+
+## Документация
+
+- `README.md` — инструкция по запуску и описание API.
+- `REPORT.md` — полный отчёт по лабораторной работе.
+- `REPORT.html` — тот же отчёт в виде готовой к просмотру и печати HTML-страницы.
 
 ## Запуск
 
