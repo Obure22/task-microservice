@@ -60,7 +60,7 @@ Postman / curl
 Требуется установленный Docker Desktop (или Docker Engine + Compose v2).
 
 ```bash
-git clone <URL-репозитория>
+git clone https://github.com/Obure22/task-microservice.git
 cd task-microservice
 docker compose up --build
 ```
